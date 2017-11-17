@@ -5,8 +5,8 @@ Mine historical Twitter data
 for specific hashtags.
 """
 import sys
-if('GetOldTweets-python' not in sys.path):
-    sys.path.append('GetOldTweets-python')
+if('GetOldTweets' not in sys.path):
+    sys.path.append('GetOldTweets')
 import got
 from argparse import ArgumentParser
 import pandas as pd
@@ -32,7 +32,11 @@ def mine_for_hashtags(hashtags, start_date, end_date):
     tweetCriteria = got.manager.TweetCriteria().setQuerySearch(hashtags_str)
     tweetCriteria.setSince(start_date)
     tweetCriteria.setUntil(end_date)
-    tweets = got.manager.TweetManager.getTweets(tweetCriteria)
+    try:
+        tweets = got.manager.TweetManager.getTweets(tweetCriteria)
+    except Exception, e:
+        print('halting mine because of exception %s'%(e))
+        tweets = []
     return tweets
 
 ## TODO: rewrite the mining code to dump directly to file instead of storing in memory
@@ -60,17 +64,17 @@ def main():
         print('mining hashtag %s'%(hashtag))
         tweets = mine_for_hashtags([hashtag], start_date, end_date)
         print('collected %d tweets'%(len(tweets)))
-
-        ## convert data and write to file
-        tweet_vals = map(vars, tweets)
-        tweet_df = pd.concat(map(pd.Series, tweet_vals), axis=1).transpose()
-        # clean text
-        space_matcher = re.compile('\t|\n')
-        clean_txt = lambda x: space_matcher.sub(' ', x)
-        tweet_df.loc[:, 'text'] = tweet_df.loc[:, 'text'].apply(clean_txt)
-#         hashtag_str = ','.join(hashtags)
-        out_file_name = os.path.join(out_dir, '%s_%s_%s.tsv'%(hashtag, start_date, end_date))
-        tweet_df.to_csv(out_file_name, sep='\t', index=False, encoding='utf-8')
+        if(len(tweets) > 0):
+            ## convert data and write to file
+            tweet_vals = map(vars, tweets)
+            tweet_df = pd.concat(map(pd.Series, tweet_vals), axis=1).transpose()
+            # clean text
+            space_matcher = re.compile('\t|\n')
+            clean_txt = lambda x: space_matcher.sub(' ', x)
+            tweet_df.loc[:, 'text'] = tweet_df.loc[:, 'text'].apply(clean_txt)
+    #         hashtag_str = ','.join(hashtags)
+            out_file_name = os.path.join(out_dir, '%s_%s_%s.tsv'%(hashtag, start_date, end_date))
+            tweet_df.to_csv(out_file_name, sep='\t', index=False, encoding='utf-8')
     
 if __name__ == '__main__':
     main()
