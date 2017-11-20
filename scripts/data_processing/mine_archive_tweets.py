@@ -13,6 +13,15 @@ from datetime import datetime
 import re
 import gzip
 import sys
+from unidecode import unidecode
+# suppress unidecode warning
+import warnings
+# def warning_func():
+#     warnings.warn('RuntimeWarning', RuntimeWarning)
+# with warnings.catch_warnings():
+#     warnings.simplefilter('ignore')
+#     warning_func()
+warnings.filterwarnings('ignore')
 
 SPACE_MATCHER = re.compile('\t|\n')
 clean_txt = lambda x: SPACE_MATCHER.sub(' ', x)
@@ -26,37 +35,50 @@ def mine_tweets(tweet_file_name, hashtag, out_file):
                               'user_mentions' : 'mentions'}
     permalink_builder = 'https://twitter.com/%s/status/%s'
 #     with codecs.open(out_file_name, 'w', encoding='utf-8') as output_file:
+    decode_txt = lambda x: unidecode(x)
+    hashtag_no_accent = decode_txt(hashtag.decode('utf-8'))
+    hashtag_lower = hashtag.lower()
+    hashtag_lower_no_accent = decode_txt(hashtag_lower.decode('utf-8'))
+    hashtag_list = [hashtag, hashtag_no_accent, hashtag_lower, hashtag_lower_no_accent]
+    hashtag_matcher = re.compile('|'.join(map(lambda x: '#%s'%(x), hashtag_list)))
+    tweet_ctr = 0
     for l in gzip.open(tweet_file_name, 'r'):
         try:
             tweet = json.loads(l.strip())
             # test for deletion
             if(tweet.get('delete') is None and tweet.get('status_withheld') is None):
-                # extract entity vars
-                if(tweet.get('entities') is not None):
-                    for e_v in entity_vars:
-                        tweet[e_v] = tweet['entities'][e_v]
-                # attempt to extract social vars
-                for v in social_vars:
-                    if(tweet.get(v) is None):
-                        v_fixed = v.replace('_count', 's')
-                        if(tweet.get(v_fixed) is not None):
-                            tweet[v] = tweet[v_fixed]
-                        else:
-                            tweet[v] = 0
-                # extract user name
-                tweet['screen_name'] = tweet['user']['screen_name']
-                # build permalink
-                tweet['permalink'] = permalink_builder%(tweet['screen_name'], tweet['id_str'])
-                # clean text
-                tweet['text'] = clean_txt(tweet['text'])
-                # rename keys
-                for v1, v2 in data_var_rename_lookup.iteritems():
-                    tweet[v2] = tweet[v1]
-                    del(tweet[v1])
-                # collect data
-                tweet_line = ['%s'%(tweet[v]) for v in data_vars]
-
-                out_file.write('\t'.join(tweet_line))
+                # check for hashtag in text!
+                # TODO: more graceful way of matching on hashtags
+                if(tweet.get('text') is not None and len(hashtag_matcher.findall(tweet['text'])) > 0):
+                    # extract entity vars
+                    if(tweet.get('entities') is not None):
+                        for e_v in entity_vars:
+                            tweet[e_v] = tweet['entities'][e_v]
+                    # attempt to extract social vars
+                    for v in social_vars:
+                        if(tweet.get(v) is None):
+                            v_fixed = v.replace('_count', 's')
+                            if(tweet.get(v_fixed) is not None):
+                                tweet[v] = tweet[v_fixed]
+                            else:
+                                tweet[v] = 0
+                    # extract user name
+                    tweet['screen_name'] = tweet['user']['screen_name']
+                    # build permalink
+                    tweet['permalink'] = permalink_builder%(tweet['screen_name'], tweet['id_str'])
+                    # clean text
+                    tweet['text'] = clean_txt(tweet['text'])
+                    # rename keys
+                    for v1, v2 in data_var_rename_lookup.iteritems():
+                        tweet[v2] = tweet[v1]
+                        del(tweet[v1])
+                    # collect data
+                    tweet_line = ['%s'%(tweet[v]) for v in data_vars]
+                    # write!!
+                    out_file.write('\t'.join(tweet_line))
+                    tweet_ctr += 1
+                    if(tweet_ctr % 100 == 0):
+                        print('collected %d tweets'%(tweet_ctr))
         except Exception, e:
             try:
                 print(json.dumps(tweet, indent=2))
@@ -101,6 +123,7 @@ def main():
         print(out_file_name)
         with codecs.open(out_file_name, 'w', encoding='utf-8') as out_file:
             for tweet_file in tweet_files:
+                print('processing file %s'%(tweet_file))
                 mine_tweets(tweet_file, hashtag, out_file)
     
 if __name__ == '__main__':
