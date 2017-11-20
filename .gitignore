@@ -1,1 +1,4 @@
 data/tweets
+bin/
+include/
+lib/
