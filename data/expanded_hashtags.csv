@@ -5,6 +5,15 @@ s,hashtag,sentiment,comments
 *,IndependenciaCataluña,pro,
 ,FreePiolin,pro,
 ,TotsSomCatalunya,pro,
+,1ONoTincPor,pro,"I'm not afraid"
+,SpanishDictatorship,pro,
+,spainispain,pro,
+,CATvotaSí,pro,
+,SpanishRepression,pro,
+,LetCatalansVote,pro,
+,Freedom4Catalonia,pro,
+,marxem,pro,"let's march"
+,1octL6,pro,L6 appears to be a metro station - maybe where clashes started?
 ,ProuPuigdemont,anti,
 ,OrgullososDeSerEspañoles,anti,
 ,NoALosPaísesCatalanes,anti,
@@ -14,6 +23,11 @@ s,hashtag,sentiment,comments
 *,EspañaUnida,anti,
 ,EspanaNoSeRompe,anti,
 ,ProuPuigdemont,anti,
+,DefiendeEspaña,anti,
+,DontDUIt,anti,
+,PorLaUnidadDeEspaña,anti,
+,contralaindependencia,anti,
+,CataloniaIsNotSpain,anti,
 *,CatalanReferendum,neut,
 ,ReferendumCatalan,neut,
 ,1Oct,neut,
@@ -23,25 +37,11 @@ s,hashtag,sentiment,comments
 ,1O,neut,
 ,CatalanReferendum2017,neut,
 ,JoVoto,neut,
-,marxem,pro,"let's march"
-,1octL6,pro,L6 appears to be a metro station - maybe where clashes started?
 ,1Oct2017,neut,
 ,1Oct2017votarem,neut,
-,1ONoTincPor,pro,"I'm not afraid"
 ,ref1oct,neut,
-,SpanishDictatorship,pro,
-,spainispain,pro,
 ,CatalanIndyref,neut,
-,CATvotaSí,pro,
 ,CatalanRef2017,neut,
 ,referendum1deoctubre,neut,
-,DefiendeEspaña,anti,
-,DontDUIt,anti,
-,PorLaUnidadDeEspaña,anti,
-,DefiendeLaDemocracia,neut,well - both
-,contralaindependencia,anti,
-,SpanishRepression,pro,
 ,Ref1oct,neut,
-,LetCatalansVote,pro,
-,CataloniaIsNotSpain,pro,
-,Freedom4Catalonia,pro,
+,DefiendeLaDemocracia,neut,well - both
