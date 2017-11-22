@@ -22,13 +22,17 @@ done
 #echo "${ALL_FILES[@]}"
 
 ## mine files
+COUNTRY_CODE="ES"
 #COUNTRY="Spain"
-CITY="Terrassa"
+#CITY="Terrassa"
+OUT_FILE=../../data/tweets/archive_"$START_STR"_"$END_STR"_"$COUNTRY_CODE"_tweets.json
 #OUT_FILE=../../data/tweets/archive_"$START_STR"_"$END_STR"_"$COUNTRY"_tweets.json
-OUT_FILE=../../data/tweets/archive_"$START_STR"_"$END_STR"_"$CITY"_tweets.json
+#OUT_FILE=../../data/tweets/archive_"$START_STR"_"$END_STR"_"$CITY"_tweets.json
 for F in "${ALL_FILES[@]}";
 do
     echo "mining $F"
     # zcat $F | jq .place.country
-    zgrep "\"name\":\"$CITY\"" $F >> $OUT_FILE
+    zgrep "\"country_code\":\"$COUNTRY_CODE\"" $F >> $OUT_FILE
+    # zgrep "\"name\":\"$CITY\"" $F >> $OUT_FILE
+    
 done
