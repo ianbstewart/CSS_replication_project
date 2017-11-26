@@ -6,7 +6,11 @@ function mine_archive_files {
     QUERY_STR=$3
     for ARCHIVE_FILE in $ARCHIVE_FILES; do
 	echo "mining $ARCHIVE_FILE"
-	zcat $ARCHIVE_FILE | ./jq-linux64 -c "$QUERY_STR" --raw-input >> $OUT_FILE
+	# need to use zgrep because jq takes FOREVER ;_;
+	# jq
+	#zcat $ARCHIVE_FILE | ./jq-linux64 -c "$QUERY_STR" --raw-input >> $OUT_FILE
+	# grep
+	zgrep -P "$QUERY_STR" $ARCHIVE_FILE >> $OUT_FILE
     done
 }
 DATA_DIR=../../data
@@ -16,26 +20,47 @@ DATA_DIR=../../data
 #HASHTAG_FILE=$DATA_DIR/expanded_hashtags.csv
 # expanded list
 HASHTAG_FILE=$DATA_DIR/expanded_fixed_hashtags.csv
+
+## split hashtags
+# all hashtags
 HASHTAG_LIST=( $(tail -n +2 $HASHTAG_FILE | cut -d ',' -f2))
+# subset of hashtags for debuggging
+#HASHTAG_LIST=( $(tail -n +112 $HASHTAG_FILE | cut -d ',' -f2))
+# sanity check: dummy hashtag list
+#HASHTAG_LIST=( "lol" )
 HASHTAG_COUNT="${#HASHTAG_LIST[@]}"
 echo "$HASHTAG_COUNT hashtags collected"
 
-## process hashtags
+## preprocess hashtags
+# jq: add hashtags and quotes
+#for ((i=0;i<$HASHTAG_COUNT;i++)); do
+#    HASHTAG_LIST[i]="\"#${HASHTAG_LIST[i]}\""
+#done
+# grep: add hashtags
 for ((i=0;i<$HASHTAG_COUNT;i++)); do
-    HASHTAG_LIST[i]="\"#${HASHTAG_LIST[i]}\""
+   HASHTAG_LIST[i]="#${HASHTAG_LIST[i]}"
 done
 
 ## define QUERY string
 function join_by { local IFS="$1"; shift; echo "$*"; }
-HASHTAG_STR=$(join_by "," "${HASHTAG_LIST[@]}")
-QUERY_STR="fromjson? | select(.text | contains($HASHTAG_STR))"
+# jq
+#DELIM=","
+# grep
+DELIM="|"
+HASHTAG_STR=$(join_by $DELIM "${HASHTAG_LIST[@]}")
+# jq 
+#QUERY_STR="fromjson? | select(.text | contains($HASHTAG_STR))"
+# grep
+QUERY_STR=$HASHTAG_STR
 echo $QUERY_STR
 
 ## define dates
 DATE_FMT='+%b-%d-%y'
-START_STR=Mar-31-17
-END_STR=Oct-31-17
+START_STR=Dec-31-16
+#START_STR=Mar-31-17
+#END_STR=Apr-14-17
 #END_STR=Sep-01-17
+END_STR=Oct-31-17
 START_DATE=$(date -d $START_STR $DATE_FMT 2>/dev/null)
 END_DATE=$(date -d $END_STR $DATE_FMT 2>/dev/null)
 START_DATE_SEC=$(date -d $START_DATE +%s)
@@ -70,5 +95,5 @@ do
     if [ -e $OUT_FILE ]; then
 	rm $OUT_FILE
     fi
-    # (mine_archive_files "${ARCHIVE_FILES[@]}" $OUT_FILE $QUERY_STR)&    
+    (mine_archive_files "${ARCHIVE_FILES[@]}" $OUT_FILE $QUERY_STR)&    
 done
