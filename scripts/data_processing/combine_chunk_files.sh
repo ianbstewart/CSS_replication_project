@@ -1,6 +1,6 @@
 # combine chunked files into single JSON file
 DATA_DIR=../../data/tweets
-CHUNK_FILES=$(ls $DATA_DIR/*fixed_tmp.json)
+CHUNK_FILES=$(ls $DATA_DIR/*chunk.json)
 echo $CHUNK_FILES
 START_DATE=Jan-01-17
 END_DATE=Oct-31-17

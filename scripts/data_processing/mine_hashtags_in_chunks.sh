@@ -91,7 +91,7 @@ do
     echo "chunk $i"
     # echo "${ARCHIVE_FILES[@]}"
 
-    OUT_FILE=$DATA_DIR/tweets/archive_full_"$CURR_START"_"$CURR_END"_ref_hashtags_fixed_tmp.json
+    OUT_FILE=$DATA_DIR/tweets/archive_full_"$CURR_START"_"$CURR_END"_ref_hashtags_chunk.json
     if [ -e $OUT_FILE ]; then
 	rm $OUT_FILE
     fi
