@@ -11,7 +11,7 @@ from random import shuffle
 #TWEETS_FILE = '../../data/tweets/archive_Jan-01-17_Oct-31-17_ref_hashtags_filtered.json'
 
 # Experiment 1.2
-LANG_ID_FILE = '../../data/tweets/extra_user_tweets/Jan-01-17_Oct-31-17_user_tweets_langid-all1.csv'
+LANG_ID_FILE = '../../data/tweets/extra_user_tweets/Jan-01-17_Oct-31-17_user_tweets_langid.csv'
 TWEETS_FILE = '../../data/tweets/extra_user_tweets/Jan-01-17_Oct-31-17_user_tweets.json'
 
 USERS_FILE = '../../data/user_groups.csv'
