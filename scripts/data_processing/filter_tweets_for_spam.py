@@ -25,11 +25,12 @@ def main():
     out_dir = args.out_dir
     file_prefix = os.path.basename(tweet_file).replace('.json','')
 
-    log_file_name = os.path.join(out_dir, 'filter_tweets_for_spam.txt')
+    log_file_name = os.path.join(out_dir, 'filter_tweets_for_spam.log')
     logging.basicConfig(filename=log_file_name,
                         filemode='w',
+                        # format='%(asctime)s %(levelname)s %(message)s',
                         format='%(message)s',
-                        level=logging.DEBUG)
+                        level=logging.INFO)
 
     ## load data
     tweet_data = []
@@ -50,14 +51,14 @@ def main():
         except Exception, e:
             pass
         if(i % 10000 == 0):
-            logging.log(1,'processed %d tweets'%(i))
+            logging.info('processed %d tweets'%(i))
             #print('processed %d tweets'%(i))
         #if(i > cutoff):
         #    break
-    logging.log(1,'%d total tweets to start'%(len(tweet_data)))
+    logging.info('%d total tweets to start'%(len(tweet_data)))
     #print('%d total tweets to start'%(len(tweet_data)))
     tweet_data_users = set([t['user'] for t in tweet_data])
-    logging.log(1,'%d total users'%(len(tweet_data_users)))
+    logging.info('%d total users'%(len(tweet_data_users)))
     # print('%d total users'%(len(tweet_data_users)))
     
     ## zero pass: make sure tweet contains at least one referendum hashtag
@@ -68,11 +69,11 @@ def main():
     invalid_tweet_data = filter(lambda j: len(hashtag_matcher.findall(j['text'])) == 0, tweet_data)
     tweet_data = filter(lambda j: len(hashtag_matcher.findall(j['text'])) > 0, tweet_data)
     tweet_data_users = set([t['user'] for t in tweet_data])
-    logging.log(1,'%d valid tweets with %d users'%(len(tweet_data), len(tweet_data_users)))
+    logging.info('%d valid tweets with %d users'%(len(tweet_data), len(tweet_data_users)))
     # print('%d valid tweets with %d users'%(len(tweet_data), len(tweet_data_users)))
     # examples of invalid tweets?
-    logging.log(1,'invalid tweet examples')
-    logging.log(1,'\n'.join([t['text'] for t in invalid_tweet_data[:20]]))
+    logging.info('invalid tweet examples')
+    logging.info('\n'.join([t['text'] for t in invalid_tweet_data[:20]]))
     # print('invalid tweet examples')
     # print('\n'.join([t['text'] for t in invalid_tweet_data[:20]]))
     # write to file
@@ -85,7 +86,7 @@ def main():
     rt_matcher = re.compile('^rt[ :]')
     tweet_data = filter(lambda j: len(rt_matcher.findall(j['text'].lower())) == 0, tweet_data)
     tweet_data_users = set([t['user'] for t in tweet_data])
-    logging.log(1,'%d original tweets with %d users'%(len(tweet_data), len(tweet_data_users)))
+    logging.info('%d original tweets with %d users'%(len(tweet_data), len(tweet_data_users)))
     # print('%d original tweets with %d users'%(len(tweet_data), len(tweet_data_users)))
     # write to file
     original_data_file = os.path.join(out_dir, '%s_original.json'%(file_prefix))
@@ -111,26 +112,26 @@ def main():
     # compute 90th percentile
     pct = 90
     pct_cutoff = pd.np.percentile(user_url_pcts, pct)
-    logging.log(1,'%d percentile of URL counts = %.3f'%(pct, pct_cutoff))
-    logging.log(1,'%d high-URL users'%(len(user_url_pcts[user_url_pcts >= pct_cutoff])))
+    logging.info('%d percentile of URL counts = %.3f'%(pct, pct_cutoff))
+    logging.info('%d high-URL users'%(len(user_url_pcts[user_url_pcts >= pct_cutoff])))
     # print('%d percentile of URL counts = %.3f'%(pct, pct_cutoff))
     # print('%d high-URL users'%(len(user_url_pcts[user_url_pcts >= pct_cutoff])))
     # remove users with high URL percentage
     # tweet cutoff is too high, only filters a few users
     #tweet_cutoff = 5
-    # tweet_cutoff = 3
+    tweet_cutoff = 3
     # tweet count and url pct
-    # filtered_users = (user_tweet_counts[user_tweet_counts >= tweet_cutoff].index & 
-    #                   user_url_pcts[user_url_pcts >= pct_cutoff].index)
+    filtered_users = (user_tweet_counts[user_tweet_counts >= tweet_cutoff].index & 
+                      user_url_pcts[user_url_pcts >= pct_cutoff].index)
     # url pct
-    filtered_users = user_url_pcts[user_url_pcts >= pct_cutoff].index
+    # filtered_users = user_url_pcts[user_url_pcts >= pct_cutoff].index
     filtered_user_tweets = user_tweet_counts.loc[filtered_users].sum()
-    logging.log(1,'filtering %d users with %d tweets'%(len(filtered_users), filtered_user_tweets))
+    logging.info('filtering %d users with %d tweets'%(len(filtered_users), filtered_user_tweets))
     # print('filtering %d users with %d tweets'%(len(filtered_users), filtered_user_tweets))
     filtered_user_set = set(filtered_users)
     tweet_data = filter(lambda x: x['user'] not in filtered_user_set, tweet_data)
     tweet_data_users = set([t['user'] for t in tweet_data])
-    logging.log(1,'%d tweets with %d users'%(len(tweet_data), len(tweet_data_users)))
+    logging.info('%d tweets with %d users'%(len(tweet_data), len(tweet_data_users)))
     # print('%d tweets with %d users'%(len(tweet_data), len(tweet_data_users)))
     # write to file
     filtered_data_file = os.path.join(out_dir, '%s_filtered.json'%(file_prefix))
