@@ -6,8 +6,14 @@ import progressbar
 from collections import defaultdict, Counter
 from random import shuffle
 
-LANG_ID_FILE = '../../data/tweets/archive_Jan-01-17_Oct-31-17_ref_hashtags_filtered_langid.csv'
-TWEETS_FILE = '../../data/tweets/archive_Jan-01-17_Oct-31-17_ref_hashtags_filtered.json'
+# Experiment 1.1
+#LANG_ID_FILE = '../../data/tweets/archive_Jan-01-17_Oct-31-17_ref_hashtags_filtered_langid.csv'
+#TWEETS_FILE = '../../data/tweets/archive_Jan-01-17_Oct-31-17_ref_hashtags_filtered.json'
+
+# Experiment 1.2
+LANG_ID_FILE = '../../data/tweets/extra_user_tweets/Jan-01-17_Oct-31-17_user_tweets_langid.csv'
+TWEETS_FILE = '../../data/tweets/extra_user_tweets/Jan-01-17_Oct-31-17_user_tweets.json'
+
 USERS_FILE = '../../data/user_groups.csv'
 PERMUTATIONS = 100000
 
@@ -36,7 +42,8 @@ js_dec = json.JSONDecoder()
 with open(TWEETS_FILE) as tweets_file:
     for tj in tweets_file:
         tweet = js_dec.decode(tj)
-        user = tweet['user']
+        #user = tweet['user'] # 1.1
+        user = tweet['user']['screen_name'] # 1.2
         if user in user_ids:
             id = tweet['id']
             if id in lang_ids:
