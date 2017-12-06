@@ -6,16 +6,19 @@ import progressbar
 from collections import defaultdict, Counter
 from random import shuffle
 
-# Experiment 1.1
-#LANG_ID_FILE = '../../data/tweets/archive_Jan-01-17_Oct-31-17_ref_hashtags_filtered_langid.csv'
-#TWEETS_FILE = '../../data/tweets/archive_Jan-01-17_Oct-31-17_ref_hashtags_filtered.json'
+EXP = '1.1'
+#EXP = '1.2'
 
-# Experiment 1.2
-LANG_ID_FILE = '../../data/tweets/extra_user_tweets/Jan-01-17_Oct-31-17_user_tweets_langid.csv'
-TWEETS_FILE = '../../data/tweets/extra_user_tweets/Jan-01-17_Oct-31-17_user_tweets.json'
+if EXP == '1.1':
+    LANG_ID_FILE = '../../data/tweets/archive_Jan-01-17_Oct-31-17_ref_hashtags_filtered_langid.csv'
+    TWEETS_FILE = '../../data/tweets/archive_Jan-01-17_Oct-31-17_ref_hashtags_filtered.json'
+
+else: # 1.2
+    LANG_ID_FILE = '../../data/tweets/extra_user_tweets/Jan-01-17_Oct-31-17_user_tweets_langid.csv'
+    TWEETS_FILE = '../../data/tweets/extra_user_tweets/Jan-01-17_Oct-31-17_user_tweets.json'
 
 USERS_FILE = '../../data/user_groups.csv'
-PERMUTATIONS = 100000
+PERMUTATIONS = 10
 
 # cache lang ids
 lang_ids = {}
@@ -42,8 +45,8 @@ js_dec = json.JSONDecoder()
 with open(TWEETS_FILE) as tweets_file:
     for tj in tweets_file:
         tweet = js_dec.decode(tj)
-        #user = tweet['user'] # 1.1
-        user = tweet['user']['screen_name'] # 1.2
+        user = tweet['user'] if EXP == '1.1'\
+                             else tweet['user']['screen_name']
         if user in user_ids:
             id = tweet['id']
             if id in lang_ids:
@@ -58,6 +61,14 @@ def ca_rate(u):
     return user_langs[u]['ca'] / sum(user_langs[u].values())
 
 users['ca_rate'] = [ca_rate(u) for u in user_ids]
+yes_users_df = users[users['group'] == 'YES']
+no_users_df = users[users['group'] == 'NO']
+yes_null_users = yes_users_df[users['ca_rate'].isnull()]
+no_null_users = no_users_df[users['ca_rate'].isnull()]
+yes_users = yes_users_df['username'].tolist()
+no_users = no_users_df['username'].tolist()
+print 'YES users:', str(len(yes_users)-len(yes_null_users)), str(sum([sum(user_langs[u].values()) for u in yes_users]))
+print 'NO users:', str(len(no_users)-len(no_null_users)), str(sum([sum(user_langs[u].values()) for u in no_users]))
 
 def phats(df=users, gid='group'):
     phat_yes = df[df[gid] == 'YES']['ca_rate'].mean()
