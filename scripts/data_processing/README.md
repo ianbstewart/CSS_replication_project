@@ -23,3 +23,5 @@ This will produce a filtered tweet file: `~/archive_Jan-01-17_Oct-31-17_ref_hash
 7. We need control tweets for all users in the filtered tweets to compare their non-referendum Catalan use.
 We extract all control tweets: `bash mine_extra_user_tweets.sh`.
 Then, combine all the control tweets: `bash combine_user_tweets.sh`.
+8. Extract relevant data from all user control tweets for later analysis: `python extract_relevant_info_from_extra_user_tweets.py`.
+9. Get hashtag counts to report pro/neutral/anti counts for descriptive statistics: `count_hashtags_in_corpus.ipynb`
