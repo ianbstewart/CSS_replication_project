@@ -1,3 +1,0 @@
-DomingoDeGanarSeguidores
-
-HASHTAG_FILE=
