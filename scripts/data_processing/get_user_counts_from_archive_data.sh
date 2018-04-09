@@ -1,5 +1,4 @@
 source generate_dates.sh
-DATA_DIR=/hg190/corpora/twitter-crawl/new-archive
 START_DATE=Dec-31-16
 END_DATE=Oct-31-17
 ARCHIVE_FILES=$(generate_date_files $START_DATE $END_DATE)

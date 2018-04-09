@@ -8,7 +8,6 @@ echo $START_DATE
 echo $END_DATE
 DAY_COUNT=$(( ($(date --date="$END_DATE" +%s) - $(date --date="$START_DATE" +%s)) / (60*60*24) ))
 
-DATA_DIR=/hg190/corpora/twitter-crawl/new-archive
 declare -a ALL_FILES
 
 for i in $(seq 1 1 "$DAY_COUNT");

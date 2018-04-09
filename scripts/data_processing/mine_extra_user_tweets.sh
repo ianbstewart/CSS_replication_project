@@ -19,29 +19,9 @@ USER_NAMES=$(tail -n+2 $USER_COUNT_FILE | cut -d, -f 2)
 function join_by { local IFS="$1"; shift; echo "$*"; }
 USER_NAME_STR=$(join_by "|" $USER_NAMES)
 QUERY_STR="\"screen_name\":\"($USER_NAME_STR)\""
-CORPUS_DIR=/hg190/corpora/twitter-crawl/new-archive
+
 START_STR=Dec-31-16
 END_STR=Oct-31-17
-#START_DATE=Dec-31-16
-#END_DATE=Oct-31-17
-
-## mine all files at once
-#ARCHIVE_FILES=$(generate_date_files "$START_DATE" "$END_DATE")
-#OUT_FILE=$DATA_DIR/tweets/extra_user_tweets/"$START_DATE"_"$END_DATE"_user_tweets.json
-#if [ -e $OUT_FILE ];
-#then
-#    rm $OUT_FILE
-#fi
-
-## mine one file at a time
-# use zgrep because it's FASTER than jq
-# one file at a time = TOO SLOW
-# need chunks
-# for F in $ARCHIVE_FILES;
-# do
-#     echo "mining file $F"
-#     zgrep -P "$QUERY_STR" $ARCHIVE_FILE >> $OUT_FILE
-# done
 
 ## mine chunks
 DATE_FMT='+%b-%d-%y'
